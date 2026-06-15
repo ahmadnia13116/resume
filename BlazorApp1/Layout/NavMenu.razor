@@ -1,16 +1,16 @@
 ﻿@inject NavigationManager Navigation
-@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer // می‌توانید کلا حذفش کنید
 @inject IJSRuntime JSRuntime
 @inject LocalizationService L
 @implements IDisposable
 
 <MudPaper Class="@NavClass" Elevation="0">
     <div class="nav-left">
-        <MudIconButton Icon="@ThemeIcon" Color="Color.Inherit" OnClick="ToggleTheme" aria-label="theme toggle" />
+        <MudIconButton Icon="@(IsDark? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                       Color="Color.Inherit"
+                       @onclick="HandleThemeToggleClick" />
     </div>
-    
+
     <div class="nav-center">
-        <!-- 🔥 تغییر Localizer به L -->
         <MudLink Href="/" Class="@GetNavClass("/")">@L["Work"]</MudLink>
         <MudLink Href="/about" Class="@GetNavClass("/about")">@L["About"]</MudLink>
         <MudLink Href="/play" Class="@GetNavClass("/play")">@L["Play"]</MudLink>
@@ -48,16 +48,15 @@
 </MudPaper>
 
 @code {
-    [Parameter] public string NavClass { get; set; }
-    [Parameter] public string CurrentPath { get; set; }
-    
-    [Parameter] public bool IsDark { get; set; }
-    [Parameter] public EventCallback<bool> IsDarkChanged { get; set; }
-    
-    [Parameter] public string CurrentLang { get; set; } = "en-US";
-    [Parameter] public EventCallback<string> OnLanguageChanged { get; set; } // 🔥 برای اطلاع به MainLayout
+    [Parameter] public string NavClass { get; set; } = "";
+    [Parameter] public string CurrentPath { get; set; } = "/";
 
-    private string ThemeIcon => IsDark ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode;
+    [Parameter] public bool IsDark { get; set; }
+
+    [Parameter] public string CurrentLang { get; set; } = "en-US";
+    [Parameter] public EventCallback<string> OnLanguageChanged { get; set; }
+
+    [Parameter] public EventCallback<MouseEventArgs> OnThemeToggleRequested { get; set; }
 
     protected override void OnInitialized()
     {
@@ -67,12 +66,6 @@
     public void Dispose()
     {
         L.OnChange -= StateHasChanged;
-    }
-
-    private async Task ToggleTheme()
-    {
-        IsDark = !IsDark;
-        await IsDarkChanged.InvokeAsync(IsDark);
     }
 
     private string GetNavClass(string path)
@@ -85,11 +78,13 @@
     private async Task ChangeLanguage(string lang)
     {
         await JSRuntime.InvokeVoidAsync("localStorage.setItem", "culture", lang);
-        
-        // تغییر زبان در سرویس (باعث فراخوانی OnChange و StateHasChanged می‌شود)
         L.SetCulture(lang);
-        
-        // 🔥 مهم: اطلاع دادن به MainLayout برای تغییر CurrentLang و IsRTL
         await OnLanguageChanged.InvokeAsync(lang);
+    }
+
+    private async Task HandleThemeToggleClick(MouseEventArgs args)
+    {
+        // به جای تغییر مستقیم IsDark، مختصات کلیک رو به MainLayout می‌فرستیم
+        await OnThemeToggleRequested.InvokeAsync(args);
     }
 }

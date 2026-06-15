@@ -6,25 +6,25 @@
 
 <MudThemeProvider @bind-IsDarkMode="_isDark" />
 
-<!-- 🔥 اضافه کردن dir برای پشتیبانی داینامیک از RTL و LTR -->
 <MudContainer MaxWidth="MaxWidth.Large" Class="@($"main-container {(_isDark ? "dark-mode" : "")}")" dir="@(IsRTL ? "rtl" : "ltr")">
     <MudLayout>
         <NavMenu NavClass="@NavClass"
                  CurrentPath="@currentPath"
-                 @bind-IsDark="_isDark"
+                 IsDark="_isDark"
                  CurrentLang="@CurrentLang"
-                 OnLanguageChanged="@HandleLanguageChange" />
+                 OnLanguageChanged="@HandleLanguageChange"
+                 OnThemeToggleRequested="@HandleThemeToggle" />
 
         <MudMainContent Class="main-content">
             <MudContainer MaxWidth="MaxWidth.Large">
                 @Body
-                
+
                 <!-- بخش دیباگ -->
                 <div style="position:fixed; bottom:10px; right:10px; background:#333; color:#0f0; padding:10px; font-family:monospace; font-size:12px; z-index:9999;">
                     <div>Lang: @CurrentLang</div>
                     <div>Culture: @System.Globalization.CultureInfo.CurrentCulture.Name</div>
                     <div>RTL: @IsRTL</div>
-                    <div>Test: @L["Work"]</div> <!-- 🔥 تغییر به L -->
+                    <div>Test: @L["Work"]</div>
                 </div>
             </MudContainer>
         </MudMainContent>
@@ -38,7 +38,7 @@
     private string CurrentLang = "en-US";
 
     private bool IsRTL => CurrentLang == "fa-IR" || CurrentLang == "ar-SA";
-    
+
     private string NavClass => isScrolled
         ? "nav-menu nav-wrapper nav-glass"
         : "nav-menu nav-wrapper nav-transparent";
@@ -55,6 +55,7 @@
     {
         L.OnChange -= StateHasChanged;
         Navigation.LocationChanged -= OnLocationChanged;
+        dotNetRef?.Dispose();
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
@@ -70,11 +71,10 @@
         else currentPath = "/" + currentPath;
     }
 
-    // این متد وقتی NavMenu زبان را عوض کند صدا زده می‌شود
     private async Task HandleLanguageChange(string newLang)
     {
         CurrentLang = newLang;
-        StateHasChanged(); // رندر مجدد برای اعمال تغییرات方向 (RTL/LTR)
+        StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -97,5 +97,26 @@
             isScrolled = shouldBeScrolled;
             StateHasChanged();
         }
+    }
+
+    // ==========================================
+    // 🔥 متدهای جدید برای انیمیشن Circular Reveal
+    // ==========================================
+
+    private async Task HandleThemeToggle(MouseEventArgs args)
+    {
+        // فراخوانی JS برای شروع انیمیشن دایره‌ای
+        await JSRuntime.InvokeVoidAsync("toggleThemeAnimation", args.ClientX, args.ClientY, !_isDark, dotNetRef);
+    }
+
+    [JSInvokable]
+    public void CompleteThemeChange()
+    {
+        // 🔥 استفاده از InvokeAsync برای اطمینان از اجرای StateHasChanged روی رشته اصلی UI
+        InvokeAsync(() =>
+        {
+            _isDark = !_isDark;
+            StateHasChanged();
+        });
     }
 }

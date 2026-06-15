@@ -1,10 +1,10 @@
 using System.Globalization;
-using BlazorApp1;
 
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
 using MudBlazor.Services;
+using BlazorApp1;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -23,7 +23,7 @@ var js = host.Services.GetRequiredService<IJSRuntime>();
 var savedCulture = await js.InvokeAsync<string>("localStorage.getItem", "culture");
 
 // اگر زبانی ذخیره نشده بود، پیش‌فرض فارسی باشد
-var cultureName = !string.IsNullOrEmpty(savedCulture) ? savedCulture : "fa-IR";
+var cultureName = !string.IsNullOrEmpty(savedCulture) ? savedCulture : "en-EN";
 var culture = new CultureInfo(cultureName);
 
 // ➤ اعمال زبان به کل برنامه

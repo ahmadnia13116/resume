@@ -1,0 +1,131 @@
+﻿@page "/"
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+@inject LocalizationService L
+@inject IJSRuntime JSRuntime
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="star-icon">
+        <svg viewBox="0 0 100 100" fill="white">
+            <path d="M50 0 L60 40 L100 50 L60 60 L50 100 L40 60 L0 50 L40 40 Z" />
+        </svg>
+    </div>
+        
+    <MudText Typo="Typo.h1" Class="hero-title">@L["MyName"]</MudText>
+    <MudText Typo="Typo.h1" Class="hero-subtitle">@Localizer["Job"]</MudText>
+        
+    <MudText Typo="Typo.body1" Class="hero-description">
+        I'm passionate about crafting experiences that are engaging, accessible, and user-centric.
+    </MudText>
+</div>
+
+<!-- 🔥 کارت آخر با افکت جاری شدن قطره -->
+<div @ref="lastCardRef" id="droplet-target-element">
+    <MudPaper Class="card card-teal card-with-droplet" Elevation="0">
+        <MudText Typo="Typo.caption" Class="card-label">HELP SCOUT</MudText>
+        <MudText Typo="Typo.h3" Class="card-title">Articles</MudText>
+
+        <!-- کانتینر قطره -->
+        <div class="droplet-container @(_isVisible ? "visible" : "")">
+            <div class="droplet-shape">
+                @if (_imageLoaded)
+                {
+                    <img src="@ProfileImageUrl" alt="Profile" class="droplet-image" />
+                }
+                else
+                {
+                    <div class="droplet-placeholder">
+                        <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Primary" />
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="card-footer"></div>
+    </MudPaper>
+</div>
+
+<!-- Cards Section -->
+<div class="cards-grid">
+    <MudPaper Class="card card-purple" Elevation="0">
+        <MudText Typo="Typo.caption" Class="card-label">HELP SCOUT</MudText>
+        <MudText Typo="Typo.h3" Class="card-title">AI</MudText>
+        <div class="card-footer"></div>
+    </MudPaper>
+
+    <MudPaper Class="card card-teal" Elevation="0">
+        <MudText Typo="Typo.caption" Class="card-label">HELP SCOUT</MudText>
+        <MudText Typo="Typo.h3" Class="card-title">Articles</MudText>
+        <div class="card-footer"></div>
+    </MudPaper>
+</div>
+
+
+<!-- Cards Section -->
+<div class="cards-grid">
+    <MudPaper Class="card card-purple" Elevation="0">
+        <MudText Typo="Typo.caption" Class="card-label">HELP SCOUT</MudText>
+        <MudText Typo="Typo.h3" Class="card-title">AI</MudText>
+        <div class="card-footer"></div>
+    </MudPaper>
+
+    <MudPaper Class="card card-teal" Elevation="0">
+        <MudText Typo="Typo.caption" Class="card-label">HELP SCOUT</MudText>
+        <MudText Typo="Typo.h3" Class="card-title">Articles</MudText>
+        <div class="card-footer"></div>
+    </MudPaper>
+</div>
+
+<!-- Extra content for scroll demo -->
+<div class="extra-content">
+    <MudText Typo="Typo.h4">More Content Here</MudText>
+    <MudText Typo="Typo.body1">Scroll down to see the sticky glass navigation effect.</MudText>
+</div>
+
+
+
+@code {
+    private ElementReference lastCardRef;
+    private bool _isVisible = false;
+    private bool _imageLoaded = false;
+    private DotNetObjectReference<object>? dotNetRef;
+
+    [Parameter] public string ProfileImageUrl { get; set; } = "https://bairesdev.mo.cloudinary.net/blog/2023/06/asp-net-core-identity-with-patterns.jpg?tx=w_1920,q_auto";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            dotNetRef = DotNetObjectReference.Create((object)this);
+            await JSRuntime.InvokeVoidAsync("initDropletAnimation", lastCardRef, dotNetRef);
+        }
+    }
+
+    [JSInvokable]
+    public void OnElementVisible()
+    {
+        _isVisible = true;
+        InvokeAsync(StateHasChanged);
+
+        // 🔥 شروع لود عکس بعد از اینکه انیمیشن شروع شد
+        Task.Delay(300).ContinueWith(_ =>
+        {
+            _imageLoaded = true;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    [JSInvokable]
+    public void OnElementHidden()
+    {
+        _isVisible = false;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        dotNetRef?.Dispose();
+        _ = JSRuntime.InvokeVoidAsync("cleanupDropletAnimation");
+    }
+}
+

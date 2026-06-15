@@ -266,8 +266,9 @@
 /* ===== DARK MODE STYLES ===== */
 .dark-mode {
     background: linear-gradient(180deg, #0f1923 0%, #1a2332 50%, #0d1520 100%) !important;
-    transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    /* 🔴 این خط حذف شد: transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1); */
 }
+
 
     /* Dark Nav */
     .dark-mode .nav-transparent {
@@ -422,6 +423,18 @@
         color: #e2e8f0 !important;
     }
 
+.dark-mode {
+    background: linear-gradient(180deg, #0f1923 0%, #1a2332 50%, #0d1520 100%) !important;
+    /* 🔴 این خط رو حذف کنید: transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1); */
+}
+
+.main-container {
+    padding: 0 40px;
+    background: linear-gradient(180deg, #e8f5e9 0%, #f5f5dc 50%, #faf8f0 100%);
+    min-height: 100vh;
+    /* 🔴 این خط رو حذف کنید: transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1); */
+}
+
 .main-container {
     padding: 0 40px;
     background: linear-gradient(180deg, #e8f5e9 0%, #f5f5dc 50%, #faf8f0 100%);
@@ -430,7 +443,50 @@
 }
 
 
+/* ==========================================
+   🌊 استایل‌های جدید برای Ripple Effect
+   ========================================== */
 
+/* 🔥 برای مرورگرهایی که View Transition API رو پشتیبانی می‌کنن */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.7s;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(root) {
+    /* لایه قدیمی ثابت می‌مونه و انیمیشن نداره */
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+    /* لایه جدید با انیمیشن دایره‌ای ظاهر می‌شه */
+    animation-name: reveal;
+}
+
+@keyframes reveal {
+    from {
+        clip-path: circle(0px at var(--x, 50%) var(--y, 50%));
+    }
+
+    to {
+        clip-path: circle(var(--max-radius, 2000px) at var(--x, 50%) var(--y, 50%));
+    }
+}
+
+/* 🔥 کلاس‌های کمکی برای Ripple Rings */
+.theme-ripple {
+    will-change: transform, width, height, opacity;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+/* 🔥 اطمینان از اینکه همه عناصر زیر موج قرار می‌گیرن */
+.theme-reveal-overlay,
+.theme-ripple {
+    contain: strict;
+}
 
 /* استایل منوی زبان */
 .language-popover {
@@ -467,4 +523,148 @@
 
 .mr-2 {
     margin-right: 8px;
+}
+
+
+
+
+/* ==========================================
+   💧 انیمیشن جاری شدن قطره (Telegram Droplet)
+   ========================================== */
+
+.card-with-droplet {
+    position: relative;
+    overflow: visible !important; /* اجازه می‌دهد قطره از کارت بیرون بزند */
+    min-height: 200px;
+}
+
+/* کانتینر اصلی قطره (حالت اولیه: پنهان و چسبیده به بالای لبه کارت) */
+.droplet-container {
+    position: absolute;
+    bottom: -10px; /* چسبیده به لبه پایینی کارت */
+    left: 50%;
+    width: 110px;
+    height: 110px;
+    transform: translateX(-50%) translateY(-30px) scale(0.6);
+    opacity: 0;
+    z-index: 10;
+    pointer-events: none;
+}
+
+    /* حالت فعال: شروع انیمیشن */
+    .droplet-container.visible {
+        opacity: 1;
+        pointer-events: auto;
+        animation: dropletFall 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+/* شکل قطره (نگهدارنده عکس) */
+.droplet-shape {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #4db6ac 0%, #26a69a 100%);
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 🔥 شکل اولیه: قطره آب (تیز در پایین) */
+    border-radius: 50% 50% 10% 50%;
+    /* انیمیشن تغییر شکل همزمان با حرکت */
+    animation: shapeMorph 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* 🔥 انیمیشن ۱: حرکت به پایین (Fall) */
+@keyframes dropletFall {
+    0% {
+        transform: translateX(-50%) translateY(-30px) scale(0.6);
+        opacity: 0;
+    }
+
+    30% {
+        /* لحظه‌ای که قطره از کارت جدا می‌شود و آویزان است */
+        transform: translateX(-50%) translateY(10px) scale(0.75);
+        opacity: 1;
+    }
+
+    100% {
+        /* سقوط کامل و رسیدن به اندازه نهایی */
+        transform: translateX(-50%) translateY(60px) scale(1);
+        opacity: 1;
+    }
+}
+
+/* 🔥 انیمیشن ۲: تغییر شکل از قطره به دایره (Morph) */
+@keyframes shapeMorph {
+    0% {
+        border-radius: 50% 50% 10% 50%; /* قطره تیز */
+    }
+
+    30% {
+        border-radius: 50% 50% 5% 50%; /* کشیده‌ترین حالت قطره (مثل آویزان بودن) */
+    }
+
+    60% {
+        border-radius: 50% 50% 30% 50%; /* شروع به گرد شدن */
+    }
+
+    100% {
+        border-radius: 50%; /* دایره کامل */
+    }
+}
+
+/* استایل عکس داخل قطره */
+.droplet-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    /* عکس با کمی تاخیر ظاهر می‌شود تا افکت قطره کامل دیده شود */
+    animation: imageFadeIn 0.6s ease-out 0.4s backwards;
+}
+
+@keyframes imageFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Placeholder هنگام لود */
+.droplet-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e0e0e0;
+}
+
+/* ==========================================
+   🌙 Dark Mode
+   ========================================== */
+.dark-mode .droplet-shape {
+    background: linear-gradient(135deg, #1a2332 0%, #0f1920 100%);
+    border-color: rgba(77, 182, 172, 0.6);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .droplet-placeholder {
+    background: #1a2332;
+}
+
+/* ==========================================
+   📱 Responsive
+   ========================================== */
+@media (max-width: 768px) {
+    .droplet-container {
+        width: 90px;
+        height: 90px;
+    }
 }
