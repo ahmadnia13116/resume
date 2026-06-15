@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ahmadnia</title>
+
+    <base href="/resume/">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="/resume/_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link href="css/Layout.css" rel="stylesheet" />
+
+    <style>
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+        }
+
+        /* LOADING OVERLAY */
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e8f5e9, #f5f5dc, #faf8f0);
+            z-index: 99999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+            #loading-overlay.hidden {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+            }
+
+        /* Spinner */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 105, 92, 0.15);
+            border-top-color: #00695c;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .brand {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: #00695c;
+            letter-spacing: 4px;
+        }
+
+        /* APP ROOT */
+        #app {
+            min-height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LOADING -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div class="brand">AHMADNIA</div>
+    </div>
+
+    <!-- BLazor root -->
+    <div id="app"></div>
+
+    <script src="/resume/_framework/blazor.webassembly.js"></script>
+    <script src="/resume/_content/MudBlazor/MudBlazor.min.js"></script>
+
+    <script>
+        // ✅ صحیح‌ترین روش برای Blazor WASM
+        (function () {
+            function hideLoader() {
+                const loader = document.getElementById('loading-overlay');
+                if (!loader) return;
+
+                loader.classList.add('hidden');
+
+                setTimeout(() => {
+                    loader.remove();
+                }, 500);
+            }
+
+            window.addEventListener('load', function () {
+                // صبر برای Blazor render
+                setTimeout(hideLoader, 300);
+            });
+        })();
+    </script>
+    <script>
+        // wwwroot/js/themeTransition.js
+        window.toggleThemeAnimation = async (x, y, targetIsDark, dotNetHelper) => {
+            // حذف لایه‌های قبلی اگه وجود داشته باشن
+            document.querySelectorAll('.theme-reveal-overlay, .theme-ripple').forEach(el => el.remove());
+
+            // 🔥 محاسبه دقیق‌تر شعاع (قطر صفحه برای پوشش کامل)
+            const maxRadius = Math.hypot(
+                Math.max(x, window.innerWidth - x),
+                Math.max(y, window.innerHeight - y)
+            );
+
+            // ==========================================
+            // 🌟 افکت موج حلقه‌ای (Ripple Rings)
+            // ==========================================
+          // createRippleRings(x, y, maxRadius, targetIsDark);
+
+            // ==========================================
+            // 🎯 انیمیشن اصلی با View Transition API (اگه مرورگر پشتیبانی کنه)
+            // ==========================================
+            const hasViewTransition = 'startViewTransition' in document;
+
+            if (hasViewTransition) {
+                // 🔥 روش مدرن: View Transition API - دقیق‌ترین روش مثل تلگرام
+                const transition = document.startViewTransition(async () => {
+                    await dotNetHelper.invokeMethodAsync('CompleteThemeChange');
+                });
+
+              
+                transition.ready.then(() => {
+                    const clipPath = [
+                        `circle(0px at ${x}px ${y}px)`,
+                        `circle(${maxRadius}px at ${x}px ${y}px)`
+                    ];
+
+                    document.documentElement.animate(
+                        {
+                            clipPath: clipPath,
+                        },
+                        {
+                            duration: 700,
+                            easing: 'cubic-bezier(0.22, 1, 0.36, 1)', 
+                            pseudoElement: '::view-transition-new(root)',
+                        }
+                    );
+                });
+            } else {
+            
+                await performFallbackAnimation(x, y, targetIsDark, maxRadius, dotNetHelper);
+            }
+        };
+
+        // ==========================================
+        // 🌊 ساخت حلقه‌های موج (Ripple Rings)
+        // ==========================================
+        function createRippleRings(x, y, maxRadius, isDark) {
+            const ringCount = 3; // تعداد حلقه‌های موج
+
+            for (let i = 0; i < ringCount; i++) {
+                const ring = document.createElement('div');
+                ring.className = 'theme-ripple';
+
+                const ringColor = isDark
+                    ? 'rgba(77, 182, 172, 0.4)'   
+                    : 'rgba(30, 144, 255, 0.4)';  
+
+                ring.style.cssText = `
+            position: fixed;
+            left: ${x}px;
+            top: ${y}px;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            border: 2px solid ${ringColor};
+            box-shadow: 0 0 20px ${ringColor};
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 99998;
+            opacity: 1;
+        `;
+
+                document.body.appendChild(ring);
+
+               
+                const delay = i * 100; 
+                const finalRadius = maxRadius * 0.8;
+
+                setTimeout(() => {
+                    ring.style.transition = `all 1.2s cubic-bezier(0.22, 1, 0.36, 1)`;
+                    ring.style.width = `${finalRadius * 2}px`;
+                    ring.style.height = `${finalRadius * 2}px`;
+                    ring.style.opacity = '0';
+                    ring.style.borderWidth = '0px';
+                }, delay);
+
+              
+                setTimeout(() => ring.remove(), 1500 + delay);
+            }
+        }
+
+        // ==========================================
+        // 🔄 روش Fallback برای مرورگرهای قدیمی
+        // ==========================================
+        async function performFallbackAnimation(x, y, targetIsDark, maxRadius, dotNetHelper) {
+            const overlay = document.createElement('div');
+            overlay.id = 'theme-reveal-overlay';
+            overlay.className = 'theme-reveal-overlay';
+
+            overlay.style.cssText = `
+        position: fixed; 
+        top: 0; left: 0; 
+        width: 100vw; height: 100vh;
+        z-index: 99999; 
+        pointer-events: none; 
+        opacity: 0;
+    `;
+
+            // تنظیم رنگ پس‌زمینه
+            if (targetIsDark) {
+                overlay.style.background = 'linear-gradient(180deg, #0f1923 0%, #1a2332 50%, #0d1520 100%)';
+            } else {
+                overlay.style.background = 'linear-gradient(180deg, #e8f5e9 0%, #f5f5dc 50%, #faf8f0 100%)';
+            }
+
+            // شروع با دایره شعاع 0
+            overlay.style.clipPath = `circle(0px at ${x}px ${y}px)`;
+            document.body.appendChild(overlay);
+
+            // Force reflow
+            overlay.getBoundingClientRect();
+
+            // نمایش لایه
+            overlay.style.opacity = '1';
+
+            // 🔥 انیمیشن با easing دقیق‌تر تلگرام
+            overlay.style.transition = 'clip-path 0.7s cubic-bezier(0.22, 1, 0.36, 1)';
+            overlay.style.clipPath = `circle(${maxRadius}px at ${x}px ${y}px)`;
+
+            // بعد از تکمیل انیمیشن
+            setTimeout(async () => {
+                await dotNetHelper.invokeMethodAsync('CompleteThemeChange');
+
+                overlay.style.transition = 'opacity 0.4s ease';
+                overlay.style.opacity = '0';
+
+                setTimeout(() => {
+                    if (overlay.parentNode) overlay.remove();
+                }, 400);
+            }, 750);
+        }
+    </script>
+    <script>
+        // Scroll interop (safe version)
+        let scrollHandler = null;
+        let dotNetRef = null;
+
+        window.addScrollListener = function (ref) {
+
+            dotNetRef = ref;
+
+            if (scrollHandler) {
+                window.removeEventListener('scroll', scrollHandler);
+            }
+
+            scrollHandler = function () {
+                const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+
+                if (dotNetRef) {
+                    dotNetRef.invokeMethodAsync('UpdateNavOnScroll', Math.floor(scrollY));
+                }
+            };
+
+            window.addEventListener('scroll', scrollHandler, { passive: true });
+
+            scrollHandler();
+        };
+
+        window.removeScrollListener = function () {
+            if (scrollHandler) {
+                window.removeEventListener('scroll', scrollHandler);
+            }
+
+            scrollHandler = null;
+            dotNetRef = null;
+        };
+    </script>
+
+    <script>
+        // wwwroot/js/spiralAnimation.js
+
+        // wwwroot/js/dropletAnimation.js
+
+        window.initDropletAnimation = (elementFromBlazor, dotNetHelper) => {
+            let targetElement = elementFromBlazor;
+
+            // مکانیزم نجات: اگر رفرنس خالی بود، با ID پیدایش کن
+            if (!targetElement || !(targetElement instanceof Element)) {
+                targetElement = document.getElementById('droplet-target-element');
+            }
+
+            if (!targetElement) {
+                console.warn("المان droplet-target-element در DOM پیدا نشد.");
+                return;
+            }
+
+            if (window.dropletObserver) {
+                window.dropletObserver.disconnect();
+            }
+
+            window.dropletObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        dotNetHelper.invokeMethodAsync('OnElementVisible');
+                    } else {
+                        dotNetHelper.invokeMethodAsync('OnElementHidden');
+                    }
+                });
+            }, {
+                threshold: 0.2,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            window.dropletObserver.observe(targetElement);
+        };
+
+        window.cleanupDropletAnimation = () => {
+            if (window.dropletObserver) {
+                window.dropletObserver.disconnect();
+                window.dropletObserver = null;
+            }
+        };
+    </script>
+
+</body>
+
+</html>
