@@ -1,0 +1,101 @@
+﻿@inherits LayoutComponentBase
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+@inject LocalizationService L
+@implements IDisposable
+
+<MudThemeProvider @bind-IsDarkMode="_isDark" />
+
+<!-- 🔥 اضافه کردن dir برای پشتیبانی داینامیک از RTL و LTR -->
+<MudContainer MaxWidth="MaxWidth.Large" Class="@($"main-container {(_isDark ? "dark-mode" : "")}")" dir="@(IsRTL ? "rtl" : "ltr")">
+    <MudLayout>
+        <NavMenu NavClass="@NavClass"
+                 CurrentPath="@currentPath"
+                 @bind-IsDark="_isDark"
+                 CurrentLang="@CurrentLang"
+                 OnLanguageChanged="@HandleLanguageChange" />
+
+        <MudMainContent Class="main-content">
+            <MudContainer MaxWidth="MaxWidth.Large">
+                @Body
+                
+                <!-- بخش دیباگ -->
+                <div style="position:fixed; bottom:10px; right:10px; background:#333; color:#0f0; padding:10px; font-family:monospace; font-size:12px; z-index:9999;">
+                    <div>Lang: @CurrentLang</div>
+                    <div>Culture: @System.Globalization.CultureInfo.CurrentCulture.Name</div>
+                    <div>RTL: @IsRTL</div>
+                    <div>Test: @L["Work"]</div> <!-- 🔥 تغییر به L -->
+                </div>
+            </MudContainer>
+        </MudMainContent>
+    </MudLayout>
+</MudContainer>
+
+@code {
+    private bool isScrolled = false;
+    private string currentPath = "/";
+    private bool _isDark = true;
+    private string CurrentLang = "en-US";
+
+    private bool IsRTL => CurrentLang == "fa-IR" || CurrentLang == "ar-SA";
+    
+    private string NavClass => isScrolled
+        ? "nav-menu nav-wrapper nav-glass"
+        : "nav-menu nav-wrapper nav-transparent";
+
+    private DotNetObjectReference<MainLayout>? dotNetRef;
+
+    protected override void OnInitialized()
+    {
+        L.OnChange += StateHasChanged;
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    public void Dispose()
+    {
+        L.OnChange -= StateHasChanged;
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        UpdateCurrentPath(e.Location);
+        StateHasChanged();
+    }
+
+    private void UpdateCurrentPath(string uri)
+    {
+        currentPath = Navigation.ToBaseRelativePath(uri);
+        if (string.IsNullOrEmpty(currentPath)) currentPath = "/";
+        else currentPath = "/" + currentPath;
+    }
+
+    // این متد وقتی NavMenu زبان را عوض کند صدا زده می‌شود
+    private async Task HandleLanguageChange(string newLang)
+    {
+        CurrentLang = newLang;
+        StateHasChanged(); // رندر مجدد برای اعمال تغییرات方向 (RTL/LTR)
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            dotNetRef = DotNetObjectReference.Create(this);
+            await JSRuntime.InvokeVoidAsync("addScrollListener", dotNetRef);
+        }
+    }
+
+    [JSInvokable]
+    public void UpdateNavOnScroll(double scrollY)
+    {
+        int scrollInt = Convert.ToInt32(scrollY);
+        bool shouldBeScrolled = scrollInt > 50;
+
+        if (shouldBeScrolled != isScrolled)
+        {
+            isScrolled = shouldBeScrolled;
+            StateHasChanged();
+        }
+    }
+}

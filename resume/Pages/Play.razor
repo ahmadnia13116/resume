@@ -1,0 +1,489 @@
+﻿@page "/play"
+
+<div class="chess-container">
+    <div class="game-header">
+        <MudText Typo="Typo.h4" Class="game-title">Chess Game</MudText>
+        <MudChip T="string" Color="@GetTurnColor()" Size="Size.Large">
+            @(IsPlayerTurn ? "Your Turn" : "AI Thinking...")
+        </MudChip>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="ResetGame">
+            New Game
+        </MudButton>
+    </div>
+
+    <div class="game-info">
+        <MudText Typo="Typo.body1">
+            Captured by You: <strong>@capturedByPlayer.Count</strong>
+        </MudText>
+        <MudText Typo="Typo.body1">
+            Captured by AI: <strong>@capturedByAI.Count</strong>
+        </MudText>
+    </div>
+
+    <MudDropContainer T="DropItem"
+                      Items="_items"
+                      CanDropClass="mud-border-success"
+                      NoDropClass="mud-border-error"
+                      CanDrop="@CanDropItem"
+                      ItemsSelector="@((item,dropzone) => item.Identifier == dropzone)"
+                      ItemDropped="OnItemDropped"
+                      Class="chess-board">
+        <ChildContent>
+            @for (int r = 0; r < 8; r++)
+            {
+                var row = r;
+                <div class="chess-row">
+                    @for (int c = 0; c < 8; c++)
+                    {
+                        var col = c;
+                        var zoneId = $"{row}{col}";
+                        var isLight = (row + col) % 2 == 0;
+                        <MudDropZone T="DropItem"
+                                     Identifier="@zoneId"
+                                     DraggingClass="dragging-zone"
+                                     Class="@(isLight ? "chess-cell light" : "chess-cell dark")"
+                                     Style="height:70px;width:70px;" />
+                    }
+                </div>
+            }
+        </ChildContent>
+        <ItemRenderer>
+            <div class="piece-container">
+                <MudIcon Icon="@context.Icon" Color="@context.Color" Size="Size.Large" />
+            </div>
+        </ItemRenderer>
+    </MudDropContainer>
+
+    @if (!string.IsNullOrEmpty(gameStatus))
+    {
+        <MudAlert Severity="@GetAlertSeverity()" Class="game-status">
+            @gameStatus
+        </MudAlert>
+    }
+</div>
+
+@code {
+    private List<DropItem> _items = new();
+    private bool IsPlayerTurn = true;
+    private string gameStatus = "";
+    private List<DropItem> capturedByPlayer = new();
+    private List<DropItem> capturedByAI = new();
+
+    protected override void OnInitialized()
+    {
+        InitializeBoard();
+    }
+
+    private void InitializeBoard()
+    {
+        _items = new()
+        {
+            // White pieces (Player)
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessRook, Color = Color.Primary, Identifier = "70" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessKnight, Color = Color.Primary, Identifier = "71" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessBishop, Color = Color.Primary, Identifier = "72" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessQueen, Color = Color.Primary, Identifier = "73" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessKing, Color = Color.Primary, Identifier = "74" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessBishop, Color = Color.Primary, Identifier = "75" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessKnight, Color = Color.Primary, Identifier = "76" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessRook, Color = Color.Primary, Identifier = "77" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Primary, Identifier = "60" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Primary, Identifier = "61" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Primary, Identifier = "62" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Primary, Identifier = "63" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Primary, Identifier = "64" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Primary, Identifier = "65" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Primary, Identifier = "66" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Primary, Identifier = "67" },
+            
+            // Black pieces (AI)
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Secondary, Identifier = "10" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Secondary, Identifier = "11" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Secondary, Identifier = "12" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Secondary, Identifier = "13" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Secondary, Identifier = "14" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Secondary, Identifier = "15" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Secondary, Identifier = "16" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessPawn, Color = Color.Secondary, Identifier = "17" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessRook, Color = Color.Secondary, Identifier = "00" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessKnight, Color = Color.Secondary, Identifier = "01" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessBishop, Color = Color.Secondary, Identifier = "02" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessQueen, Color = Color.Secondary, Identifier = "03" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessKing, Color = Color.Secondary, Identifier = "04" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessBishop, Color = Color.Secondary, Identifier = "05" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessKnight, Color = Color.Secondary, Identifier = "06" },
+            new DropItem(){ Icon = @Icons.Custom.Uncategorized.ChessRook, Color = Color.Secondary, Identifier = "07" },
+        };
+        
+        IsPlayerTurn = true;
+        gameStatus = "";
+        capturedByPlayer.Clear();
+        capturedByAI.Clear();
+    }
+
+    private bool CanDropItem(DropItem item, string identifier)
+    {
+        if (!IsPlayerTurn || item.Color != Color.Primary)
+            return false;
+
+        var fromPos = item.Identifier;
+        var toPos = identifier;
+        
+        return IsValidMove(item, fromPos, toPos);
+    }
+
+    private async Task OnItemDropped(MudItemDropInfo<DropItem> dropItem)
+    {
+        if (!IsPlayerTurn) return;
+
+        var piece = dropItem.Item;
+        var fromPos = piece.Identifier;
+        var toPos = dropItem.DropzoneIdentifier;
+
+        if (!IsValidMove(piece, fromPos, toPos))
+            return;
+
+        // Check if capturing
+        var capturedPiece = _items.FirstOrDefault(x => x.Identifier == toPos);
+        if (capturedPiece != null)
+        {
+            capturedByPlayer.Add(capturedPiece);
+            _items.Remove(capturedPiece);
+            
+            if (capturedPiece.Icon == Icons.Custom.Uncategorized.ChessKing)
+            {
+                gameStatus = "Checkmate! You Win!";
+                StateHasChanged();
+                return;
+            }
+        }
+
+        piece.Identifier = toPos;
+        IsPlayerTurn = false;
+        StateHasChanged();
+
+        // AI move after delay
+        await Task.Delay(1000);
+        await MakeAIMove();
+    }
+
+    private bool IsValidMove(DropItem piece, string from, string to)
+    {
+        var fromRow = from[0] - '0';
+        var fromCol = from[1] - '0';
+        var toRow = to[0] - '0';
+        var toCol = to[1] - '0';
+
+        var rowDiff = Math.Abs(toRow - fromRow);
+        var colDiff = Math.Abs(toCol - fromCol);
+
+        // Can't move to same position
+        if (from == to) return false;
+
+        // Can't capture own piece
+        var targetPiece = _items.FirstOrDefault(x => x.Identifier == to);
+        if (targetPiece != null && targetPiece.Color == piece.Color)
+            return false;
+
+        // Pawn movement
+        if (piece.Icon == Icons.Custom.Uncategorized.ChessPawn)
+        {
+            var direction = piece.Color == Color.Primary ? -1 : 1;
+            var startRow = piece.Color == Color.Primary ? 6 : 1;
+
+            // Forward move
+            if (colDiff == 0 && toRow == fromRow + direction && targetPiece == null)
+                return true;
+
+            // First move (2 squares)
+            if (colDiff == 0 && fromRow == startRow && toRow == fromRow + 2 * direction && targetPiece == null)
+            {
+                var betweenRow = fromRow + direction;
+                var betweenPos = $"{betweenRow}{fromCol}";
+                return !_items.Any(x => x.Identifier == betweenPos);
+            }
+
+            // Capture diagonally
+            if (colDiff == 1 && toRow == fromRow + direction && targetPiece != null)
+                return true;
+
+            return false;
+        }
+
+        // Rook movement
+        if (piece.Icon == Icons.Custom.Uncategorized.ChessRook)
+        {
+            if (rowDiff == 0 || colDiff == 0)
+                return IsPathClear(from, to);
+            return false;
+        }
+
+        // Knight movement
+        if (piece.Icon == Icons.Custom.Uncategorized.ChessKnight)
+        {
+            return (rowDiff == 2 && colDiff == 1) || (rowDiff == 1 && colDiff == 2);
+        }
+
+        // Bishop movement
+        if (piece.Icon == Icons.Custom.Uncategorized.ChessBishop)
+        {
+            if (rowDiff == colDiff)
+                return IsPathClear(from, to);
+            return false;
+        }
+
+        // Queen movement
+        if (piece.Icon == Icons.Custom.Uncategorized.ChessQueen)
+        {
+            if (rowDiff == 0 || colDiff == 0 || rowDiff == colDiff)
+                return IsPathClear(from, to);
+            return false;
+        }
+
+        // King movement
+        if (piece.Icon == Icons.Custom.Uncategorized.ChessKing)
+        {
+            return rowDiff <= 1 && colDiff <= 1;
+        }
+
+        return false;
+    }
+
+    private bool IsPathClear(string from, string to)
+    {
+        var fromRow = from[0] - '0';
+        var fromCol = from[1] - '0';
+        var toRow = to[0] - '0';
+        var toCol = to[1] - '0';
+
+        var rowStep = Math.Sign(toRow - fromRow);
+        var colStep = Math.Sign(toCol - fromCol);
+
+        var currentRow = fromRow + rowStep;
+        var currentCol = fromCol + colStep;
+
+        while (currentRow != toRow || currentCol != toCol)
+        {
+            var pos = $"{currentRow}{currentCol}";
+            if (_items.Any(x => x.Identifier == pos))
+                return false;
+
+            currentRow += rowStep;
+            currentCol += colStep;
+        }
+
+        return true;
+    }
+
+    private async Task MakeAIMove()
+    {
+        if (gameStatus != "") return;
+
+        var aiPieces = _items.Where(x => x.Color == Color.Secondary).ToList();
+        var possibleMoves = new List<(DropItem piece, string to, int score)>();
+
+        foreach (var piece in aiPieces)
+        {
+            for (int r = 0; r < 8; r++)
+            {
+                for (int c = 0; c < 8; c++)
+                {
+                    var toPos = $"{r}{c}";
+                    if (IsValidMove(piece, piece.Identifier, toPos))
+                    {
+                        var score = EvaluateMove(piece, toPos);
+                        possibleMoves.Add((piece, toPos, score));
+                    }
+                }
+            }
+        }
+
+        if (possibleMoves.Count == 0)
+        {
+            gameStatus = "Checkmate! You Win!";
+            IsPlayerTurn = true;
+            StateHasChanged();
+            return;
+        }
+
+        // Pick best move (highest score)
+        var bestMove = possibleMoves.OrderByDescending(x => x.score).First();
+        
+        // Capture if exists
+        var capturedPiece = _items.FirstOrDefault(x => x.Identifier == bestMove.to);
+        if (capturedPiece != null)
+        {
+            capturedByAI.Add(capturedPiece);
+            _items.Remove(capturedPiece);
+            
+            if (capturedPiece.Icon == Icons.Custom.Uncategorized.ChessKing)
+            {
+                gameStatus = "Checkmate! AI Wins!";
+                StateHasChanged();
+                return;
+            }
+        }
+
+        bestMove.piece.Identifier = bestMove.to;
+        IsPlayerTurn = true;
+        StateHasChanged();
+    }
+
+    private int EvaluateMove(DropItem piece, string toPos)
+    {
+        var score = 0;
+        var targetPiece = _items.FirstOrDefault(x => x.Identifier == toPos);
+
+        // Capture bonus
+        if (targetPiece != null)
+        {
+            score += GetPieceValue(targetPiece.Icon) * 10;
+        }
+
+        // Position bonus (center control)
+        var row = toPos[0] - '0';
+        var col = toPos[1] - '0';
+        if (row >= 2 && row <= 5 && col >= 2 && col <= 5)
+            score += 2;
+
+        // Pawn advancement
+        if (piece.Icon == Icons.Custom.Uncategorized.ChessPawn)
+            score += (7 - row);
+
+        return score;
+    }
+
+    private int GetPieceValue(string icon)
+    {
+        return icon switch
+        {
+            Icons.Custom.Uncategorized.ChessPawn => 1,
+            Icons.Custom.Uncategorized.ChessKnight => 3,
+            Icons.Custom.Uncategorized.ChessBishop => 3,
+            Icons.Custom.Uncategorized.ChessRook => 5,
+            Icons.Custom.Uncategorized.ChessQueen => 9,
+            Icons.Custom.Uncategorized.ChessKing => 100,
+            _ => 0
+        };
+    }
+
+    private Color GetTurnColor()
+    {
+        return IsPlayerTurn ? Color.Success : Color.Warning;
+    }
+
+    private Severity GetAlertSeverity()
+    {
+        return gameStatus.Contains("You Win") ? Severity.Success : Severity.Error;
+    }
+
+    private void ResetGame()
+    {
+        InitializeBoard();
+        StateHasChanged();
+    }
+    public class DropItem
+    {
+        public string Icon { get; set; } = "";
+        public Color Color { get; set; }
+        public string Identifier { get; set; } = "";
+    }
+}
+
+<style>
+    .chess-container {
+        padding: 40px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .game-header {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .game-title {
+        color: #00695c !important;
+        font-weight: 700 !important;
+    }
+
+    .game-info {
+        display: flex;
+        gap: 40px;
+        padding: 20px 40px;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .chess-board {
+        border: 3px solid #00695c !important;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .chess-row {
+        display: flex;
+    }
+
+    .chess-cell {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
+
+        .chess-cell.light {
+            background: #f0d9b5;
+        }
+
+        .chess-cell.dark {
+            background: #b58863;
+        }
+
+        .chess-cell:hover {
+            filter: brightness(1.1);
+        }
+
+    .dragging-zone {
+        background: rgba(0, 105, 92, 0.3) !important;
+    }
+
+    .piece-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+    }
+
+        .piece-container:active {
+            cursor: grabbing;
+        }
+
+    .game-status {
+        max-width: 600px;
+        width: 100%;
+    }
+
+    @@media (max-width: 640px) {
+        .chess-cell {
+            height: 50px !important;
+            width: 50px !important;
+        }
+
+        .game-info {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+</style>

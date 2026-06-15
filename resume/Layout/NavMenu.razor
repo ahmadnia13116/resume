@@ -1,0 +1,95 @@
+﻿@inject NavigationManager Navigation
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer // می‌توانید کلا حذفش کنید
+@inject IJSRuntime JSRuntime
+@inject LocalizationService L
+@implements IDisposable
+
+<MudPaper Class="@NavClass" Elevation="0">
+    <div class="nav-left">
+        <MudIconButton Icon="@ThemeIcon" Color="Color.Inherit" OnClick="ToggleTheme" aria-label="theme toggle" />
+    </div>
+    
+    <div class="nav-center">
+        <!-- 🔥 تغییر Localizer به L -->
+        <MudLink Href="/" Class="@GetNavClass("/")">@L["Work"]</MudLink>
+        <MudLink Href="/about" Class="@GetNavClass("/about")">@L["About"]</MudLink>
+        <MudLink Href="/play" Class="@GetNavClass("/play")">@L["Play"]</MudLink>
+        <MudLink Href="/notes" Class="@GetNavClass("/notes")">@L["Notes"]</MudLink>
+        <MudLink Href="/contact" Class="@GetNavClass("/contact")">@L["Contact"]</MudLink>
+    </div>
+
+    <div class="nav-right">
+        <MudMenu Icon="@Icons.Material.Filled.Language" Color="Color.Inherit" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+            <MudMenuItem OnClick="@(() => ChangeLanguage("en-US"))">
+                @if (CurrentLang == "en-US")
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" Class="mr-2" />
+                }
+                English
+            </MudMenuItem>
+
+            <MudMenuItem OnClick="@(() => ChangeLanguage("fa-IR"))">
+                @if (CurrentLang == "fa-IR")
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" Class="mr-2" />
+                }
+                فارسی
+            </MudMenuItem>
+
+            <MudMenuItem OnClick="@(() => ChangeLanguage("fr-FR"))">
+                @if (CurrentLang == "fr-FR")
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" Class="mr-2" />
+                }
+                French
+            </MudMenuItem>
+        </MudMenu>
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter] public string NavClass { get; set; }
+    [Parameter] public string CurrentPath { get; set; }
+    
+    [Parameter] public bool IsDark { get; set; }
+    [Parameter] public EventCallback<bool> IsDarkChanged { get; set; }
+    
+    [Parameter] public string CurrentLang { get; set; } = "en-US";
+    [Parameter] public EventCallback<string> OnLanguageChanged { get; set; } // 🔥 برای اطلاع به MainLayout
+
+    private string ThemeIcon => IsDark ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode;
+
+    protected override void OnInitialized()
+    {
+        L.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        L.OnChange -= StateHasChanged;
+    }
+
+    private async Task ToggleTheme()
+    {
+        IsDark = !IsDark;
+        await IsDarkChanged.InvokeAsync(IsDark);
+    }
+
+    private string GetNavClass(string path)
+    {
+        var cleanCurrent = string.IsNullOrEmpty(CurrentPath) || CurrentPath == "/" ? "/" : CurrentPath;
+        var cleanPath = string.IsNullOrEmpty(path) || path == "/" ? "/" : path;
+        return cleanCurrent == cleanPath ? "nav-item active" : "nav-item";
+    }
+
+    private async Task ChangeLanguage(string lang)
+    {
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "culture", lang);
+        
+        // تغییر زبان در سرویس (باعث فراخوانی OnChange و StateHasChanged می‌شود)
+        L.SetCulture(lang);
+        
+        // 🔥 مهم: اطلاع دادن به MainLayout برای تغییر CurrentLang و IsRTL
+        await OnLanguageChanged.InvokeAsync(lang);
+    }
+}

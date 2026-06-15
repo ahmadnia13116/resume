@@ -1,0 +1,165 @@
+﻿@page "/debug"
+
+@using System.Globalization
+@inject IJSRuntime JS
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Loc
+
+<h3>Localization Debug Center</h3>
+
+<div class="mb-3">
+    <button class="btn btn-primary me-2" @onclick="RunDiagnostics">
+        اجرای تست کامل
+    </button>
+
+    <button class="btn btn-success me-2" @onclick="SwitchToPersian">
+        تغییر به فارسی
+    </button>
+
+    <button class="btn btn-secondary" @onclick="SwitchToEnglish">
+        تغییر به انگلیسی
+    </button>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Output))
+{
+    <pre style="
+    background:#111;
+    color:#00ff88;
+    padding:20px;
+    border-radius:8px;
+    font-size:14px;
+    white-space:pre-wrap;
+    direction:ltr;
+    text-align:left;">@Output</pre>
+}
+
+@code {
+
+    private string Output = "";
+
+    private async Task RunDiagnostics()
+    {
+        Output = "";
+
+        try
+        {
+            Output += "========================================\n";
+            Output += " LOCALIZATION DIAGNOSTICS\n";
+            Output += "========================================\n\n";
+
+            //-----------------------------------
+            // Current Culture
+            //-----------------------------------
+
+            Output += "[1] CURRENT CULTURE\n";
+
+            Output += $"CurrentCulture     : {CultureInfo.CurrentCulture.Name}\n";
+            Output += $"CurrentUICulture   : {CultureInfo.CurrentUICulture.Name}\n";
+            Output += $"DisplayName        : {CultureInfo.CurrentCulture.DisplayName}\n\n";
+
+            //-----------------------------------
+            // Local Storage
+            //-----------------------------------
+
+            Output += "[2] LOCAL STORAGE\n";
+
+            var savedCulture =
+                await JS.InvokeAsync<string>("localStorage.getItem", "culture");
+
+            Output += $"culture            : {savedCulture ?? "(null)"}\n\n";
+
+            //-----------------------------------
+            // Localization Test
+            //-----------------------------------
+
+            Output += "[3] LOCALIZER TEST\n";
+
+            var work = Loc["Work"];
+            var about = Loc["About"];
+
+            Output += $"Work               : {work.Value}\n";
+            Output += $"About              : {about.Value}\n\n";
+
+            Output += $"Work.NotFound      : {work.ResourceNotFound}\n";
+            Output += $"About.NotFound     : {about.ResourceNotFound}\n\n";
+
+            //-----------------------------------
+            // Resources
+            //-----------------------------------
+
+            Output += "[4] EMBEDDED RESOURCES\n";
+
+            var assembly = typeof(Program).Assembly;
+
+            var resources = assembly.GetManifestResourceNames();
+
+            if (resources.Length == 0)
+            {
+                Output += "No resources found.\n";
+            }
+            else
+            {
+                foreach (var resource in resources)
+                {
+                    Output += $"• {resource}\n";
+                }
+            }
+
+            Output += "\n";
+
+            //-----------------------------------
+            // Direct Culture Test
+            //-----------------------------------
+
+            Output += "[5] DIRECT CULTURE CHECK\n";
+
+            var fa = new CultureInfo("fa-IR");
+
+            Output += $"Test Culture       : {fa.Name}\n";
+            Output += $"Parent Culture     : {fa.Parent.Name}\n";
+
+            Output += "\n========================================\n";
+            Output += "END OF REPORT\n";
+            Output += "========================================\n";
+        }
+        catch (Exception ex)
+        {
+            Output =
+$@"ERROR
+
+Message:
+{ex.Message}
+
+StackTrace:
+{ex.StackTrace}";
+        }
+    }
+
+    private async Task SwitchToPersian()
+    {
+        var culture = new CultureInfo("fa-IR");
+
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+        await JS.InvokeVoidAsync("localStorage.setItem", "culture", "fa-IR");
+
+        await RunDiagnostics();
+
+        StateHasChanged();
+    }
+
+    private async Task SwitchToEnglish()
+    {
+        var culture = new CultureInfo("en-US");
+
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+        await JS.InvokeVoidAsync("localStorage.setItem", "culture", "en-US");
+
+        await RunDiagnostics();
+
+        StateHasChanged();
+    }
+}

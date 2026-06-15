@@ -1,0 +1,470 @@
+﻿.main-container {
+    padding: 0 40px;
+    background: linear-gradient(180deg, #e8f5e9 0%, #f5f5dc 50%, #faf8f0 100%);
+    min-height: 100vh;
+}
+
+.nav-wrapper {
+    position: sticky;
+    top: 20px;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.nav-left {
+    position: absolute;
+    left: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.nav-right {
+    position: absolute;
+    right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.nav-center {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 40px;
+    padding: 15px 40px;
+    border-radius: 50px;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.6s cubic-bezier(0.4, 0, 0.2, 1), -webkit-backdrop-filter 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+}
+
+.nav-transparent {
+    background-color: rgba(255, 255, 255, 0) !important;
+    backdrop-filter: blur(0px) !important;
+    -webkit-backdrop-filter: blur(0px) !important;
+    border-color: rgba(255, 255, 255, 0) !important;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0) !important;
+}
+
+.nav-glass {
+    background-color: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(30px) !important;
+    -webkit-backdrop-filter: blur(30px) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Override MudLink default styles */
+.nav-item {
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    color: #2d3436 !important;
+    font-weight: 500;
+    text-decoration: none !important;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+    .nav-item:hover {
+        color: #00695c !important;
+        text-decoration: none !important;
+    }
+
+    .nav-item.active {
+        background: #00695c !important;
+        color: white !important;
+        text-decoration: none !important;
+    }
+
+.hero-section {
+    text-align: center;
+    padding: 60px 0 60px;
+    position: relative;
+}
+
+.hero-title {
+    font-size: 120px !important;
+    font-weight: 900 !important;
+    color: #00695c !important;
+    line-height: 1.1 !important;
+    margin-bottom: 0 !important;
+    letter-spacing: -2px;
+}
+
+.hero-subtitle {
+    font-size: 110px !important;
+    font-weight: 900 !important;
+    color: #00695c !important;
+    line-height: 1.1 !important;
+    margin: 0 0 40px 0 !important;
+    letter-spacing: -2px;
+}
+
+.hero-description {
+    font-size: 20px !important;
+    color: #636e72 !important;
+    max-width: 600px;
+    margin: 0 auto !important;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+.star-icon {
+    position: absolute;
+    left: 15%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    opacity: 0.6;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    padding: 60px 0;
+}
+
+.card {
+    border-radius: 30px !important;
+    padding: 50px;
+    min-height: 300px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+    }
+
+.card-purple {
+    background: linear-gradient(135deg, #e1bee7 0%, #ce93d8 100%);
+}
+
+.card-teal {
+    background: linear-gradient(135deg, #b2dfdb 0%, #80cbc4 100%);
+}
+
+.card-label {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    letter-spacing: 2px;
+    color: #2d3436;
+    margin-bottom: 15px;
+}
+
+.card-title {
+    font-size: 48px !important;
+    font-weight: 700 !important;
+    color: #2d3436;
+}
+
+.card-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 30px 30px;
+}
+
+.extra-content {
+    padding: 100px 0;
+    text-align: center;
+}
+
+@@media (max-width: 968px) {
+    .hero-title {
+        font-size: 80px !important;
+    }
+
+    .hero-subtitle {
+        font-size: 70px !important;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+
+
+    .nav-menu {
+        gap: 20px;
+        padding: 12px 24px;
+    }
+
+    .main-container {
+        padding: 0 20px;
+    }
+}
+
+@@media (max-width: 640px) {
+    .hero-title {
+        font-size: 60px !important;
+    }
+
+    .hero-subtitle {
+        font-size: 50px !important;
+    }
+
+    .card {
+        padding: 30px;
+    }
+
+    .card-title {
+        font-size: 36px !important;
+    }
+}
+
+@@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-title, .hero-subtitle, .hero-description {
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.hero-subtitle {
+    animation-delay: 0.2s;
+}
+
+.hero-description {
+    animation-delay: 0.4s;
+}
+
+.card {
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+    .card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+/* ===== DARK MODE STYLES ===== */
+.dark-mode {
+    background: linear-gradient(180deg, #0f1923 0%, #1a2332 50%, #0d1520 100%) !important;
+    transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+    /* Dark Nav */
+    .dark-mode .nav-transparent {
+        background-color: rgba(15, 25, 35, 0) !important;
+        border-color: rgba(255, 255, 255, 0) !important;
+    }
+
+    .dark-mode .nav-glass {
+        background-color: rgba(30, 41, 59, 0.6) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .dark-mode .nav-item {
+        color: #e2e8f0 !important;
+    }
+
+        .dark-mode .nav-item:hover {
+            color: #4db6ac !important;
+        }
+
+        .dark-mode .nav-item.active {
+            background: #4db6ac !important;
+            color: #0f1923 !important;
+        }
+
+    /* Dark Hero */
+    .dark-mode .hero-title,
+    .dark-mode .hero-subtitle {
+        color: #4db6ac !important;
+    }
+
+    .dark-mode .hero-description {
+        color: #94a3b8 !important;
+    }
+
+    /* Dark Cards */
+    .dark-mode .card {
+        background: rgba(30, 41, 59, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+        .dark-mode .card:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+        }
+
+    .dark-mode .card-label,
+    .dark-mode .card-title {
+        color: #e2e8f0 !important;
+    }
+
+    .dark-mode .card-footer {
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Dark Card Gradients - نسخه تیره‌تر */
+    .dark-mode .card-purple {
+        background: linear-gradient(135deg, #4a1942 0%, #6b2160 100%) !important;
+    }
+
+    .dark-mode .card-teal {
+        background: linear-gradient(135deg, #134e4a 0%, #115e59 100%) !important;
+    }
+
+    /* Dark Extra Content */
+    .dark-mode .extra-content {
+        color: #94a3b8;
+    }
+
+        .dark-mode .extra-content .mud-typography {
+            color: #94a3b8 !important;
+        }
+
+    /* Dark About Page */
+    .dark-mode .about-title {
+        color: #4db6ac !important;
+    }
+
+    .dark-mode .about-description {
+        color: #94a3b8 !important;
+    }
+
+    .dark-mode .contact-card {
+        background: rgba(30, 41, 59, 0.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+        .dark-mode .contact-card:hover {
+            background: rgba(30, 41, 59, 0.8) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+        }
+
+    .dark-mode .card-text {
+        color: #94a3b8 !important;
+    }
+
+    .dark-mode .stats-section {
+        background: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .dark-mode .stat-number {
+        color: #4db6ac !important;
+    }
+
+    .dark-mode .stat-label {
+        color: #94a3b8 !important;
+    }
+
+    /* Dark Chess Page */
+    .dark-mode .game-title {
+        color: #4db6ac !important;
+    }
+
+    .dark-mode .game-info {
+        background: rgba(30, 41, 59, 0.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        color: #e2e8f0 !important;
+    }
+
+        .dark-mode .game-info .mud-typography {
+            color: #e2e8f0 !important;
+        }
+
+    .dark-mode .chess-board {
+        border-color: #4db6ac !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .dark-mode .chess-cell.light {
+        background: #2d4a5e;
+    }
+
+    .dark-mode .chess-cell.dark {
+        background: #1a3040;
+    }
+
+    .dark-mode .dragging-zone {
+        background: rgba(77, 182, 172, 0.3) !important;
+    }
+
+    /* Smooth transition for all elements */
+    .dark-mode .mud-typography,
+    .dark-mode .mud-link,
+    .dark-mode .mud-chip,
+    .dark-mode .mud-alert {
+        transition: color 0.4s ease, background-color 0.4s ease;
+    }
+
+    /* Dark mode toggle button */
+    .dark-mode .mud-icon-button {
+        color: #e2e8f0 !important;
+    }
+
+.main-container {
+    padding: 0 40px;
+    background: linear-gradient(180deg, #e8f5e9 0%, #f5f5dc 50%, #faf8f0 100%);
+    min-height: 100vh;
+    transition: background 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+
+
+/* استایل منوی زبان */
+.language-popover {
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.dark-mode .language-popover {
+    background-color: rgba(30, 41, 59, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.language-list {
+    min-width: 150px !important;
+    padding: 8px 0 !important;
+}
+
+.language-item {
+    cursor: pointer !important;
+    transition: background-color 0.2s ease !important;
+    padding: 10px 16px !important;
+}
+
+    .language-item:hover {
+        background-color: rgba(0, 0, 0, 0.05) !important;
+    }
+
+.dark-mode .language-item:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.mr-2 {
+    margin-right: 8px;
+}

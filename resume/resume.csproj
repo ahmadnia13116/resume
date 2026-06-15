@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
+	</PropertyGroup>
+
+	
+	<ItemGroup>
+	  <None Include="Resources\SharedResource.en.resx" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Resources\SharedResource.fa.resx">
+			<Generator></Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\SharedResource.en.resx">
+			<Generator></Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\SharedResource.de.resx">
+			<Generator></Generator>
+		</EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.17" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.17" PrivateAssets="all" />
+		<PackageReference Include="MudBlazor" Version="9.5.0" />
+		<PackageReference Include="MudBlazor.ThemeManager" Version="4.0.0" />
+	</ItemGroup>
+
+</Project>
