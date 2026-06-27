@@ -138,4 +138,29 @@
   <data name="Job" xml:space="preserve">
     <value>توسعه‌دهنده نرم‌افزار</value>
   </data>
+  <data name="MyAbout" xml:space="preserve">
+    <value>من برنامه‌نویس بک‌اند .NET، توسعه‌دهنده نرم‌افزار و مهندس نرم‌افزار هستم. علاقه‌مند به طراحی و توسعه سیستم‌های مقیاس‌پذیر، معماری نرم‌افزار، APIها و بهینه‌سازی عملکرد. همواره در حال یادگیری فناوری‌های جدید و ساخت راهکارهای قابل اعتماد و کارآمد هستم.</value>
+  </data>
+  <data name=".NETBackendDeveloper" xml:space="preserve">
+    <value>برنامه‌نویس بک‌اند .NET، توسعه‌دهنده و مهندس نرم‌افزار، علاقه‌مند به ساخت نرم‌افزارهای مقیاس‌پذیر، قابل اعتماد و باکیفیت.</value>
+  </data>
+  <data name="ChessGame" xml:space="preserve">
+    <value>بازی شطرنج
+</value>
+  </data>
+  <data name="NewGame" xml:space="preserve">
+    <value>بازی جدید</value>
+  </data>
+  <data name="YourTurn" xml:space="preserve">
+    <value>نوبت شماست</value>
+  </data>
+  <data name="AIThinking" xml:space="preserve">
+    <value>تفکر...</value>
+  </data>
+  <data name="CapturedByAi" xml:space="preserve">
+    <value>ثبت‌شده توسط هوش مصنوعی</value>
+  </data>
+  <data name="CapturedByYou" xml:space="preserve">
+    <value>ثبت‌شده توسط شما</value>
+  </data>
 </root>

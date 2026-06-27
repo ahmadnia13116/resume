@@ -138,4 +138,29 @@
   <data name="Job" xml:space="preserve">
     <value>A Programmer.</value>
   </data>
+  <data name="MyAbout" xml:space="preserve">
+    <value>I am a .NET Backend Developer, Software Developer, and Software Engineer. Passionate about designing and building scalable systems, software architecture, APIs, and performance optimization. I am always learning new technologies and creating reliable, efficient software solutions.</value>
+  </data>
+  <data name=".NETBackendDeveloper" xml:space="preserve">
+    <value>.NET Backend Developer, Software Developer &amp; Software Engineer passionate about building scalable, reliable, and high-quality software.</value>
+  </data>
+  <data name="ChessGame" xml:space="preserve">
+    <value>Chess Game
+</value>
+  </data>
+  <data name="NewGame" xml:space="preserve">
+    <value>New Game</value>
+  </data>
+  <data name="YourTurn" xml:space="preserve">
+    <value>Your Turn</value>
+  </data>
+  <data name="AIThinking" xml:space="preserve">
+    <value>AI Thinking...</value>
+  </data>
+  <data name="CapturedByAi" xml:space="preserve">
+    <value>Captured by AI</value>
+  </data>
+  <data name="CapturedByYou" xml:space="preserve">
+    <value>Captured by You</value>
+  </data>
 </root>

@@ -138,4 +138,28 @@
   <data name="Job" xml:space="preserve">
     <value>développeur logiciel</value>
   </data>
+  <data name="MyAbout" xml:space="preserve">
+    <value>Je suis développeur Backend .NET, développeur logiciel et ingénieur logiciel. Passionné par la conception et le développement de systèmes évolutifs, l'architecture logicielle, les API et l'optimisation des performances. J'aime apprendre de nouvelles technologies et créer des solutions logicielles fiables et performantes.</value>
+  </data>
+  <data name=".NETBackendDeveloper" xml:space="preserve">
+    <value>Développeur Backend .NET, développeur logiciel et ingénieur logiciel, passionné par la création de logiciels évolutifs, fiables et de haute qualité.</value>
+  </data>
+  <data name="ChessGame" xml:space="preserve">
+    <value>Skákspæl</value>
+  </data>
+  <data name="NewGame" xml:space="preserve">
+    <value>Nýtt spæl</value>
+  </data>
+  <data name="YourTurn" xml:space="preserve">
+    <value>Tín túrur</value>
+  </data>
+  <data name="AIThinking" xml:space="preserve">
+    <value>AI hugsan...</value>
+  </data>
+  <data name="CapturedByAi" xml:space="preserve">
+    <value>Capturé par l'IA</value>
+  </data>
+  <data name="CapturedByYou" xml:space="preserve">
+    <value>Capturé par vous</value>
+  </data>
 </root>

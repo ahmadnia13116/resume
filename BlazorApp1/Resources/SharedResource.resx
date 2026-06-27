@@ -138,4 +138,28 @@
   <data name="Job" xml:space="preserve">
     <value>Job</value>
   </data>
+  <data name="MyAbout" xml:space="preserve">
+    <value>MyAbout</value>
+  </data>
+  <data name=".NETBackendDeveloper" xml:space="preserve">
+    <value>.NETBackendDeveloper</value>
+  </data>
+  <data name="ChessGame" xml:space="preserve">
+    <value>ChessGame</value>
+  </data>
+  <data name="NewGame" xml:space="preserve">
+    <value>NewGame</value>
+  </data>
+  <data name="YourTurn" xml:space="preserve">
+    <value>YourTurn</value>
+  </data>
+  <data name="AIThinking" xml:space="preserve">
+    <value>AIThinking</value>
+  </data>
+  <data name="CapturedByAi" xml:space="preserve">
+    <value>CapturedByAi</value>
+  </data>
+  <data name="CapturedByYou" xml:space="preserve">
+    <value>CapturedByYou</value>
+  </data>
 </root>

@@ -1,12 +1,12 @@
 ﻿@page "/about"
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
 <div class="about-container">
     <!-- Hero Section -->
     <div class="about-hero">
-        <MudText Typo="Typo.h2" Class="about-title">About Me</MudText>
+        <MudText Typo="Typo.h2" Class="about-title">@Localizer["About"]</MudText>
         <MudText Typo="Typo.body1" Class="about-description">
-            I'm a passionate software developer with expertise in modern web technologies.
-            I love creating beautiful, functional, and user-friendly applications.
+                    @Localizer["MyAbout"]
         </MudText>
     </div>
 

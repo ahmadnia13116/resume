@@ -11,17 +11,22 @@
         <NavMenu NavClass="@NavClass"
                  CurrentPath="@currentPath"
                  IsDark="_isDark"
-                 CurrentLang="@CurrentLang"
+                 CurrentLang="@L.CurrentCulture"
                  OnLanguageChanged="@HandleLanguageChange"
                  OnThemeToggleRequested="@HandleThemeToggle" />
 
         <MudMainContent Class="main-content">
             <MudContainer MaxWidth="MaxWidth.Large">
-                @Body
+                
+                @* 🔥 ترفند اصلی: استفاده از @key برای رفرش ریز کل @Body *@
+                @* با تغییر زبان، مقدار @key عوض شده و بلیزر کل محتوای صفحه را Re-mount می‌کند *@
+                <div @key="@L.CurrentCulture">
+                    @Body
+                </div>
 
                 <!-- بخش دیباگ -->
                 <div style="position:fixed; bottom:10px; right:10px; background:#333; color:#0f0; padding:10px; font-family:monospace; font-size:12px; z-index:9999;">
-                    <div>Lang: @CurrentLang</div>
+                    <div>Lang: @L.CurrentCulture</div>
                     <div>Culture: @System.Globalization.CultureInfo.CurrentCulture.Name</div>
                     <div>RTL: @IsRTL</div>
                     <div>Test: @L["Work"]</div>
@@ -35,7 +40,10 @@
     private bool isScrolled = false;
     private string currentPath = "/";
     private bool _isDark = true;
-    private string CurrentLang = "en-US";
+    
+    // 🔥 تغییر کلیدی ۱: به جای تعریف متغیر مستقل، مستقیماً از سرویس بخوانید
+    // این کار باعث می‌شود همیشه مقدار به‌روز زبان را داشته باشید
+    private string CurrentLang => L.CurrentCulture;
 
     private bool IsRTL => CurrentLang == "fa-IR" || CurrentLang == "ar-SA";
 
@@ -71,10 +79,13 @@
         else currentPath = "/" + currentPath;
     }
 
-    private async Task HandleLanguageChange(string newLang)
+    // 🔥 تغییر کلیدی ۲: این متد دیگر نیازی به تغییر CurrentLang ندارد
+    // چون CurrentLang الان یک Property است که مستقیماً از L.CurrentCulture می‌خواند
+    private Task HandleLanguageChange(string newLang)
     {
-        CurrentLang = newLang;
+        // فقط یک StateHasChanged اضافه برای اطمینان
         StateHasChanged();
+        return Task.CompletedTask;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -99,20 +110,14 @@
         }
     }
 
-    // ==========================================
-    // 🔥 متدهای جدید برای انیمیشن Circular Reveal
-    // ==========================================
-
     private async Task HandleThemeToggle(MouseEventArgs args)
     {
-        // فراخوانی JS برای شروع انیمیشن دایره‌ای
         await JSRuntime.InvokeVoidAsync("toggleThemeAnimation", args.ClientX, args.ClientY, !_isDark, dotNetRef);
     }
 
     [JSInvokable]
     public void CompleteThemeChange()
     {
-        // 🔥 استفاده از InvokeAsync برای اطمینان از اجرای StateHasChanged روی رشته اصلی UI
         InvokeAsync(() =>
         {
             _isDark = !_isDark;

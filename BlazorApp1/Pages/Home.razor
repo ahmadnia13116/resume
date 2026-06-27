@@ -2,6 +2,7 @@
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 @inject LocalizationService L
 @inject IJSRuntime JSRuntime
+@implements IDisposable
 
 <!-- Hero Section -->
 <div class="hero-section">
@@ -11,21 +12,20 @@
         </svg>
     </div>
         
-    <MudText Typo="Typo.h1" Class="hero-title">@L["MyName"]</MudText>
+    <MudText Typo="Typo.h1" Class="hero-title">@Localizer["MyName"]</MudText>
     <MudText Typo="Typo.h1" Class="hero-subtitle">@Localizer["Job"]</MudText>
         
     <MudText Typo="Typo.body1" Class="hero-description">
-        I'm passionate about crafting experiences that are engaging, accessible, and user-centric.
+        @Localizer[".NETBackendDeveloper"]
     </MudText>
 </div>
 
-<!-- 🔥 کارت آخر با افکت جاری شدن قطره -->
+<!-- کارت آخر با افکت جاری شدن قطره -->
 <div @ref="lastCardRef" id="droplet-target-element">
     <MudPaper Class="card card-teal card-with-droplet" Elevation="0">
         <MudText Typo="Typo.caption" Class="card-label">HELP SCOUT</MudText>
         <MudText Typo="Typo.h3" Class="card-title">Articles</MudText>
 
-        <!-- کانتینر قطره -->
         <div class="droplet-container @(_isVisible ? "visible" : "")">
             <div class="droplet-shape">
                 @if (_imageLoaded)
@@ -60,35 +60,18 @@
     </MudPaper>
 </div>
 
-
-<!-- Cards Section -->
-<div class="cards-grid">
-    <MudPaper Class="card card-purple" Elevation="0">
-        <MudText Typo="Typo.caption" Class="card-label">HELP SCOUT</MudText>
-        <MudText Typo="Typo.h3" Class="card-title">AI</MudText>
-        <div class="card-footer"></div>
-    </MudPaper>
-
-    <MudPaper Class="card card-teal" Elevation="0">
-        <MudText Typo="Typo.caption" Class="card-label">HELP SCOUT</MudText>
-        <MudText Typo="Typo.h3" Class="card-title">Articles</MudText>
-        <div class="card-footer"></div>
-    </MudPaper>
-</div>
-
 <!-- Extra content for scroll demo -->
 <div class="extra-content">
     <MudText Typo="Typo.h4">More Content Here</MudText>
     <MudText Typo="Typo.body1">Scroll down to see the sticky glass navigation effect.</MudText>
 </div>
 
-
-
 @code {
     private ElementReference lastCardRef;
     private bool _isVisible = false;
     private bool _imageLoaded = false;
-    private DotNetObjectReference<object>? dotNetRef;
+    private DotNetObjectReference<object>? dotNetRef;  // 🔥 استفاده از object
+    private CancellationTokenSource? _cts;
 
     [Parameter] public string ProfileImageUrl { get; set; } = "https://bairesdev.mo.cloudinary.net/blog/2023/06/asp-net-core-identity-with-patterns.jpg?tx=w_1920,q_auto";
 
@@ -102,30 +85,38 @@
     }
 
     [JSInvokable]
-    public void OnElementVisible()
+    public async Task OnElementVisible()
     {
         _isVisible = true;
-        InvokeAsync(StateHasChanged);
+        StateHasChanged();
 
-        // 🔥 شروع لود عکس بعد از اینکه انیمیشن شروع شد
-        Task.Delay(300).ContinueWith(_ =>
+        _cts = new CancellationTokenSource();
+        try
         {
+            await Task.Delay(300, _cts.Token);
             _imageLoaded = true;
-            InvokeAsync(StateHasChanged);
-        });
+            StateHasChanged();
+        }
+        catch (TaskCanceledException)
+        {
+            // کامپوننت قبل از اتمام delay نابود شد
+        }
     }
 
     [JSInvokable]
     public void OnElementHidden()
     {
         _isVisible = false;
-        InvokeAsync(StateHasChanged);
+        StateHasChanged();
     }
 
     public void Dispose()
     {
+        _cts?.Cancel();
+        _cts?.Dispose();
+        
         dotNetRef?.Dispose();
+        
         _ = JSRuntime.InvokeVoidAsync("cleanupDropletAnimation");
     }
 }
-

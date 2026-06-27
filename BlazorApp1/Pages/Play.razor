@@ -1,22 +1,24 @@
 ﻿@page "/play"
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+
 
 <div class="chess-container">
     <div class="game-header">
-        <MudText Typo="Typo.h4" Class="game-title">Chess Game</MudText>
+        <MudText Typo="Typo.h4" Class="game-title">@Localizer["ChessGame"]</MudText>
         <MudChip T="string" Color="@GetTurnColor()" Size="Size.Large">
-            @(IsPlayerTurn ? "Your Turn" : "AI Thinking...")
+            @(IsPlayerTurn ? @Localizer["YourTurn"] : @Localizer["AIThinking"])
         </MudChip>
         <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="ResetGame">
-            New Game
+            @Localizer["NewGame"]
         </MudButton>
     </div>
 
     <div class="game-info">
         <MudText Typo="Typo.body1">
-            Captured by You: <strong>@capturedByPlayer.Count</strong>
+            @Localizer["CapturedByAi"]: <strong>@capturedByPlayer.Count</strong>
         </MudText>
         <MudText Typo="Typo.body1">
-            Captured by AI: <strong>@capturedByAI.Count</strong>
+            @Localizer["CapturedByYou"]: <strong>@capturedByAI.Count</strong>
         </MudText>
     </div>
 

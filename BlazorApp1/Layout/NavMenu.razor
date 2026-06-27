@@ -1,5 +1,7 @@
 ﻿@inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+
 @inject LocalizationService L
 @implements IDisposable
 
@@ -11,11 +13,11 @@
     </div>
 
     <div class="nav-center">
-        <MudLink Href="/" Class="@GetNavClass("/")">@L["Work"]</MudLink>
-        <MudLink Href="/about" Class="@GetNavClass("/about")">@L["About"]</MudLink>
-        <MudLink Href="/play" Class="@GetNavClass("/play")">@L["Play"]</MudLink>
-        <MudLink Href="/notes" Class="@GetNavClass("/notes")">@L["Notes"]</MudLink>
-        <MudLink Href="/contact" Class="@GetNavClass("/contact")">@L["Contact"]</MudLink>
+        <MudLink Href="/" Class="@GetNavClass("/")">@Localizer["Work"]</MudLink>
+        <MudLink Href="/about" Class="@GetNavClass("/about")">@Localizer["About"]</MudLink>
+        <MudLink Href="/play" Class="@GetNavClass("/play")">@Localizer["Play"]</MudLink>
+        <MudLink Href="/notes" Class="@GetNavClass("/notes")">@Localizer["Notes"]</MudLink>
+        <MudLink Href="/contact" Class="@GetNavClass("/contact")">@Localizer["Contact"]</MudLink>
     </div>
 
     <div class="nav-right">
